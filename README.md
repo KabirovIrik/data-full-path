@@ -17,3 +17,5 @@ sklearn
 
 ## Размещение модели
 joblib, Heroku
+
+## https://beton-td-idf.herokuapp.com/
