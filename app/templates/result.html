@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Анализ текста страницы</title>
+	<!-- CSS only -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+	<div class="container">
+		<div class="px-4 py-5 my-5 text-center mb-6">
+			<h1 class="display-5 fw-bold">Анализ текста</h1>
+			<div class="col-lg-6 mx-auto">
+				<form action="#" method="POST" id="form">
+					<div class="mb-3"> 
+						<label for="URL" class="form-label">URL</label>
+						<input type="text" class="form-control" name="URL" id="URL" value="{{ result['URL'] }}" required>
+					</div>
+					<div class="mb-3"> 
+						<label for="query" class="form-label">Поисковый запрос</label>
+						<select class="form-select" id="query" name="query">
+							{% for row in quries_ufa %}
+								{% if row[0] == result['query'] %}
+						  		<option value='{{ row[0] }}' selected>{{ row[0] }}</option>
+						  		{% else %}
+						  		<option value='{{ row[0] }}'>{{ row[0] }}</option>
+						  		{% endif %}
+						  	{% endfor %}
+						</select>
+					</div>
+					<button type="submit" class="btn btn-primary">Проверить</button>
+				</form>
+			</div>
+		</div>
+		<div class="result-block" id="result-block">
+			<h4>Вероятность попасть на первую страницу яндекса: {{ result['predict'] }}%</h4>
+			<table class="table">
+				<thead>
+					<tr>
+						<th scope="col">Параметр</th>
+						<th scope="col">Ваше значение</th>
+						<th scope="col">Рекомендуемое<br> Минимальное</th>
+						<th scope="col">Рекомендуемое<br> Максимальное</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row">Водность</th>
+						{% if result['water_content'] < result['q']['borders']['water_content'][0] or result['water_content'] > result['q']['borders']['water_content'][1] %}
+						<td class="bad-value">{{ result['water_content'] }}</td>
+						{% else %}
+						<td class="good-value">{{ result['water_content'] }}</td>
+						{% endif %}
+						<td>{{ result['q']['borders']['water_content'][0] }}</td>
+						<td>{{ result['q']['borders']['water_content'][1] }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Спамность</th>
+						{% if result['spamity'] < result['q']['borders']['spamity'][0] or result['spamity'] > result['q']['borders']['spamity'][1] %}
+						<td class="bad-value">{{ result['spamity'] }}</td>
+						{% else %}
+						<td class="good-value">{{ result['spamity'] }}</td>
+						{% endif %}
+						<td>{{ result['q']['borders']['spamity'][0] }}</td>
+						<td>{{ result['q']['borders']['spamity'][1] }}</td>
+					</tr>
+					<tr>
+						<th scope="row">Частота запроса</th>
+						{% if result['density'] < result['q']['borders']['density'][0] or result['density'] > result['q']['borders']['density'][1] %}
+						<td class="bad-value">{{ result['density'] }}</td>
+						{% else %}
+						<td class="good-value">{{ result['density'] }}</td>
+						{% endif %}
+						<td>{{ result['q']['borders']['density'][0] }}</td>
+						<td>{{ result['q']['borders']['density'][1] }}</td>
+					</tr>
+					<tr>
+						<th scope="row">TF-IDF</th>
+						{% if result['tf_idf'] < result['q']['borders']['tf_idf'][0] or result['tf_idf'] > result['q']['borders']['tf_idf'][1] %}
+						<td class="bad-value">{{ result['tf_idf'] }}</td>
+						{% else %}
+						<td class="good-value">{{ result['tf_idf'] }}</td>
+						{% endif %}
+						<td>{{ result['q']['borders']['tf_idf'][0] }}</td>
+						<td>{{ result['q']['borders']['tf_idf'][1] }}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>	
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+	<style>
+		.good-value {
+			background: #b2ff78 !important;
+		}
+
+		.bad-value {
+			background: #ff7878 !important;
+		}
+	</style>
+</body>
+</html>
