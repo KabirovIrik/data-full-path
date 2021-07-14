@@ -9,10 +9,10 @@
 - TF-IDF
 <br>
 Выполненные шаги:  
-1. <a href="/collect">Сбор данных</a>
-2. <a href="/analysis">Анализ и обработка данных</a>
-3. <a href="/prepareToDeploy">Подгтовка модели</a>
-4. <a href="/app">Размещение модели</a>
+* <a href="/collect">Сбор данных</a>
+* <a href="/analysis">Анализ и обработка данных</a>
+* <a href="/prepareToDeploy">Подгтовка модели</a>
+* <a href="/app">Размещение модели</a>
 <br>
 
 ## Стек технологий
