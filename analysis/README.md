@@ -1,6 +1,8 @@
 # Анализ данных
 
-<div>
-<a href='../collect' style='float:left;'>Назад  - сбор данных</a>
-  <a href='../collect' style='float:right;'>Вперед - подготовка к размещению</a>
-</div>
+<table>
+  <tr>
+    <td><a href='../collect'>Назад  - сбор данных</a></td>
+    <td><a href='../collect'>Вперед - подготовка к размещению</a></td>
+  </tr>
+</table>
