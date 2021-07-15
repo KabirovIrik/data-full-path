@@ -40,9 +40,13 @@ def getResponse(query_input, url):
 
     with open('query_dict_data.pkl', 'rb') as f:
         query_data = pickle.load(f)[query_input_common]
-        rf_model = joblib.load(query_data['model'])
+        rf_model = joblib.load('models/'+query_data['model_rf'])
+        gbc_model = joblib.load('models/'+query_data['model_gbc'])
 
-    data_to_model['predict'] = np.int(rf_model.predict_proba(predict_data)[0][0] * 100)
+    rf_pred = np.int(rf_model.predict_proba(predict_data)[0][0] * 100)
+    gbc_pref = np.int(gbc_model.predict_proba(predict_data)[0][0] * 100)
+
+    data_to_model['predict'] = np.int((rf_pred + gbc_pref) / 2)
     data_to_model['q'] = query_data
 
 
