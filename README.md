@@ -24,7 +24,7 @@
 API, selenium
 
 ### Анализ и обработка данных
-pandas
+pandas, nltk
 
 ### Подгтовка модели
 sklearn
