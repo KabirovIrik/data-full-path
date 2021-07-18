@@ -35,7 +35,7 @@ API, selenium
 pandas, nltk
 
 ### Подгтовка модели
-sklearn
+sklearn, joblib, pickle
 
 ### Размещение модели
 Heroku, Flask
