@@ -2,11 +2,9 @@ from flask import Flask, render_template, request
 import pandas as pd
 
 from utils import *
-from getResponse import *
+from convertInput import *
 
 
-#query_input = 'керамзитобетонные блоки в Уфе'
-#url = 'https://ufa.promportal.su/tags/8433/bloki-keramzitobetonnie/'
 
 app = Flask(__name__)
 
