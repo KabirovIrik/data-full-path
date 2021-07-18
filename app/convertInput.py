@@ -7,6 +7,7 @@ import joblib, pickle, re, nltk, csv, pymorphy2, requests
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import label_binarize
 from selenium import webdriver
+import joblib, pickle
 #from nltk.corpus import stopwords as nltk_stopwords
 
 
@@ -26,25 +27,14 @@ with open('stopwords.csv', encoding='utf-8') as csv_file:
     for row in file:
         all_stopwords.append(row[0])
 
-# Входные данные:
-# - html-текст
-# - Поисковый запрос
-# - Город
-
-# In[3]:
-
 
 if USE_SELENIUM:
-    chromedriver = 'd:/games/chrome/chromedriver.exe'
+    chromedriver = 'chromedriver.exe'
     options = webdriver.ChromeOptions()
     options.add_argument('--no-sandbox') # Bypass OS security model
     options.add_argument('headless')  # для открытия headless-браузера
     browser = webdriver.Chrome(executable_path=chromedriver, chrome_options=options)
 
-
-
-
-# In[5]:
 
 
 df_cities = pd.read_csv('lr_regions.csv', encoding='UTF-8', sep=';')
@@ -56,9 +46,6 @@ with open('qu_idf.pkl', 'rb') as f:
 
 
 # # Готовим текст
-
-# In[6]:
-
 
 def replaceCityName(val):
     for city in all_cities:
@@ -81,10 +68,6 @@ def get_lemm(text):
 
 # # Получаем фичи
 
-# In[7]:
-
-
-#len_mt, len_md, len_kw, len_w_mt, len_w_md, len_w_kw
 def getMeta(val):
     """
     val - html docuemnt
@@ -168,3 +151,55 @@ def getTFIDF(density, qu):
     tf = df[df['url'] == url][q+'_density'].values[0]
     idf = qu_idf[q]
     return tf/idf
+
+def getResponse(query_input, url):
+
+    if USE_SELENIUM:
+        browser.get(url)
+        my_file = browser.page_source
+    else:
+        my_file = requests.get(url).text
+
+    my_file = replaceCityName(my_file)
+    textContent = get_lemm(getTextContent(my_file))
+
+
+    df_q = pd.read_csv('queries_full.csv', sep=';')
+    query = df_q[df_q['search_query'] == query_input]
+    query_input_common = ' '.join([morph.parse(w)[0].normal_form for w in tokenizer.tokenize(query_input)]).replace(city_name.lower(), replace_city_name)
+
+
+    data_to_model = {}
+    data_to_model['freq'] = query['freq'].values[0] 
+    data_to_model['query_results_count_num'] = query['query_results_count_num'].values[0] 
+    title, descr, kw, data_to_model['len_mt'], data_to_model['len_md'], data_to_model['len_kw']   = getMeta(my_file)
+    data_to_model['len_w_mt'] = getLenWords(title)
+    data_to_model['len_w_md'] = getLenWords(descr)
+    data_to_model['len_w_kw'] = getLenKeyWords(kw)
+    data_to_model['words_count'], data_to_model['words_count_sw'] = getWordsCount(textContent)
+    data_to_model['spamity'], data_to_model['max_spam'] = getSpamity(textContent)
+    data_to_model['water_content'] = getWaterContent(textContent, data_to_model['words_count'])
+    data_to_model['density'] = getDensityApply(textContent, query_input_common, replace_city=False)
+    data_to_model['tf_idf'] = data_to_model['density']/qu_idf[query_input_common]
+
+
+    list_columns = ['freq', 'query_results_count_num', 'len_mt', 'len_md', 'len_kw',
+           'len_w_mt', 'len_w_md', 'len_w_kw', 'words_count', 'words_count_sw',
+           'spamity', 'max_spam', 'water_content', 'tf_idf', 'density']
+    predict_data = np.array([data_to_model[col] for col in list_columns]).reshape(1, -1)
+
+
+    with open('query_dict_data.pkl', 'rb') as f:
+        query_data = pickle.load(f)[query_input_common]
+        rf_model = joblib.load('models/'+query_data['model_rf'])
+        gbc_model = joblib.load('models/'+query_data['model_gbc'])
+
+    rf_pred = np.int(rf_model.predict_proba(predict_data)[0][0] * 100)
+    gbc_pref = np.int(gbc_model.predict_proba(predict_data)[0][0] * 100)
+
+    data_to_model['predict'] = np.int((rf_pred + gbc_pref) / 2)
+    data_to_model['q'] = query_data
+
+
+
+    return data_to_model
