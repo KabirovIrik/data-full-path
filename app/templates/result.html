@@ -15,16 +15,16 @@
 				<form action="#" method="POST" id="form">
 					<div class="mb-3 url-block"> 
 						<label for="URL" class="form-label">URL</label>
-						<input type="text" class="form-control" name="URL" id="URL" value="{{ result['URL'] }}" required>
+						<input type="text" class="form-control" name="URL" id="URL" value="{{ result['URL'] }}" placeholder="http://example.ru" required>
 					</div>
 					<div class="mb-3"> 
 						<label for="query" class="form-label">Поисковый запрос</label>
 						<select class="form-select" id="query" name="query">
 							{% for row in quries_ufa %}
-								{% if row[0] == result['query'] %}
-						  		<option value='{{ row[0] }}' selected>{{ row[0] }}</option>
+								{% if row == result['query'] %}
+						  		<option value='{{ row }}' selected>{{ row }}</option>
 						  		{% else %}
-						  		<option value='{{ row[0] }}'>{{ row[0] }}</option>
+						  		<option value='{{ row }}'>{{ row }}</option>
 						  		{% endif %}
 						  	{% endfor %}
 						</select>
