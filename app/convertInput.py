@@ -152,7 +152,7 @@ def getTFIDF(density, qu):
     idf = qu_idf[q]
     return tf/idf
 
-def getResponse(query_input, url):
+def getResponse(query_input, url, is_api=False, USE_SELENIUM=False):
 
     if USE_SELENIUM:
         browser.get(url)
@@ -183,9 +183,11 @@ def getResponse(query_input, url):
     data_to_model['tf_idf'] = data_to_model['density']/qu_idf[query_input_common]
 
 
-    list_columns = ['freq', 'query_results_count_num', 'len_mt', 'len_md', 'len_kw',
+    list_columns = [
+           'freq', 'query_results_count_num', 'len_mt', 'len_md', 'len_kw',
            'len_w_mt', 'len_w_md', 'len_w_kw', 'words_count', 'words_count_sw',
-           'spamity', 'max_spam', 'water_content', 'tf_idf', 'density']
+           'spamity', 'max_spam', 'water_content', 'tf_idf', 'density'
+    ]
     predict_data = np.array([data_to_model[col] for col in list_columns]).reshape(1, -1)
 
 
@@ -200,6 +202,13 @@ def getResponse(query_input, url):
     data_to_model['predict'] = np.int((rf_pred + gbc_pref) / 2)
     data_to_model['q'] = query_data
 
-
-
-    return data_to_model
+    if is_api:
+        api_data = {
+            'prediction':data_to_model['predict'],
+            'spamity':data_to_model['spamity'],
+            'water_content':data_to_model['water_content'],
+            'tf_idf':data_to_model['tf_idf'],
+        }
+        return api_data
+    else:
+        return data_to_model
