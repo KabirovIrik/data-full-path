@@ -38,6 +38,6 @@ pandas, nltk
 sklearn, joblib, pickle
 
 ### Размещение модели
-Heroku, Flask
+Heroku, Flask, API
 
 
